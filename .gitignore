@@ -1,0 +1,7 @@
+/*.*
+!.gitignore
+!deno.json
+!README.md
+!mod.ts
+!src
+!src/**/*.ts
