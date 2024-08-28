@@ -1,6 +1,6 @@
 {
-  "name": "hmmarkdown",
-  "version": "0.1.1",
+  "name": "@dbushell/hmmarkdown",
+  "version": "0.1.2",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/dbushell/hmmarkdown.git"

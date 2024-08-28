@@ -1,6 +1,6 @@
 # 🤔 Hmmarkdown
 
-[![JSR](https://jsr.io/badges/@dbushell/hmmarkdown?labelColor=98e6c8&color=333)](https://jsr.io/@dbushell/hmmarkdown) [![NPM](https://img.shields.io/npm/v/hmmarkdown?labelColor=98e6c8&color=333)](https://www.npmjs.com/package/hmmarkdown)
+[![JSR](https://jsr.io/badges/@dbushell/hmmarkdown?labelColor=98e6c8&color=333)](https://jsr.io/@dbushell/hmmarkdown) [![NPM](https://img.shields.io/npm/v/@dbushell/hmmarkdown?labelColor=98e6c8&color=333)](https://www.npmjs.com/package/@dbushell/hmmarkdown)
 
 **Hmmarkdown** is a HTML-aware Markdown parser and renderer. Hmmarkdown is as fast as everything else. If you need faster stop using JavaScript.
 

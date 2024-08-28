@@ -1,9 +1,11 @@
+/*
 /*.*
 !.github
 !.gitignore
 !deno.json
 !package.json
 !README.md
+!LICENSE
 !mod.ts
 !src
 !src/**/*.ts
