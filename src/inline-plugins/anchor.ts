@@ -5,6 +5,9 @@ import {escape} from '../vendor/std-html.ts';
 
 const REGEXP = /(?<!\!)\[(.+?)\]\(([^()\s]+)\)/g;
 
+// Apply to anchor text content
+const inlinePlugins = ['deleted', 'emphasis', 'strong'];
+
 /*
 
 Okay hear me out...
@@ -50,8 +53,6 @@ const reduceMatch = (match: RegExpExecArray) => {
     text: [...text.slice(1, -1)].reverse().join('')
   };
 };
-
-const inlinePlugins = ['emphasis', 'strong'];
 
 const plugin: InlinePlugin = {
   type: 'anchor',
