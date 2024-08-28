@@ -6,10 +6,9 @@ const REGEXP = /^(#{1,6})\s+/;
 const idAttribute = (text: string) =>
   text
     // Remove diacritical marks
-    .normalize()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036F]/g, '')
     .toLowerCase()
-    // .normalize('NFD')
-    // .replace(/[\u0300-\u036F]/g, '')
     // Strip tags
     .replace(/<\/?[^>]+>/g, '')
     // Replace ampersand
