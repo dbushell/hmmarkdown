@@ -16,7 +16,7 @@ export const mergeNodes = (
   options: HmmOptions,
   callback: (node: HmmNode) => boolean,
   type: HmmNode['type'] = 'void'
-) => {
+): HmmNode => {
   if (callback(root)) {
     root.text = flattenNode(root, options);
     root.type = type;
@@ -29,7 +29,7 @@ export const mergeNodes = (
 };
 
 /* Merge adjacent text nodes */
-export const mergeTextNodes = (root: HmmNode, options: HmmOptions) => {
+export const mergeTextNodes = (root: HmmNode, options: HmmOptions): void => {
   const children: Array<HmmNode> = [];
   let group: HmmNode = {
     parent: root,

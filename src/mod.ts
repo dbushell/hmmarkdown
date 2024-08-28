@@ -92,7 +92,7 @@ export const parse = async (
 export const hmmarkdown = async (
   input: string | ReadableStream<Uint8Array>,
   options = defaultOptions
-) => {
+): Promise<string> => {
   const blocks = await parse(input, options);
   return (await Promise.all(blocks)).join('');
 };

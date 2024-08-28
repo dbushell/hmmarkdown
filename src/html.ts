@@ -66,7 +66,7 @@ export const parentElements = [
   'footer',
   'form',
   'header',
-  'html' /* used by parser as root node */,
+  'html', // used by parser as root node
   'main',
   'nav',
   'search',

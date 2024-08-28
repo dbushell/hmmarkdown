@@ -33,7 +33,7 @@ export const replace = (
   search: string,
   replace = '',
   all = false
-) => {
+): string => {
   let parts = subject.split(search);
   if (parts.length === 1) return subject;
   if (!all) parts = [parts.shift()!, parts.join(search)];

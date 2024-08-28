@@ -19,7 +19,10 @@ export const renderInline = async (
 };
 
 /** Apply inline render to text nodes */
-export const renderTextNodes = async (root: HmmNode, options: HmmOptions) => {
+export const renderTextNodes = async (
+  root: HmmNode,
+  options: HmmOptions
+): Promise<void> => {
   if (root.tag === 'code') return;
   if (root.type === 'text') {
     root.text = await renderInline(root.text, options);
@@ -35,7 +38,10 @@ export const renderTextNodes = async (root: HmmNode, options: HmmOptions) => {
 };
 
 /** Apply image render to top-level HTML `<img>` nodes */
-export const renderImageNodes = async (root: HmmNode, options: HmmOptions) => {
+export const renderImageNodes = async (
+  root: HmmNode,
+  options: HmmOptions
+): Promise<void> => {
   const imagePlugin = options.blockPlugins.find(
     (plugin) => plugin.type === 'image'
   );
@@ -69,7 +75,7 @@ export const renderNode = async (
   text: string,
   options: HmmOptions,
   tag?: string
-) => {
+): Promise<{text: string; node: HmmNode}> => {
   const node = parseNode(text, options, tag);
   await renderTextNodes(node, options);
   // Merge rendered text inlines nodes
