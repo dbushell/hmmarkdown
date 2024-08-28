@@ -19,6 +19,9 @@
   "types": "src/types.ts",
   "files": [
     "src",
-    "mod.ts"
+    "mod.ts",
+    "package.json",
+    "LICENSE",
+    "README.md"
   ]
 }
