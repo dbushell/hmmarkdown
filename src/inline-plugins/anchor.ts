@@ -8,14 +8,12 @@ const REGEXP = /(?<!\!)\[(.+?)\]\(([^()\s]+)\)/g;
 // Apply to anchor text content
 const inlinePlugins = ['deleted', 'emphasis', 'strong'];
 
-/*
-
-Okay hear me out...
-Give the following markdown line:
+/**
+Okay hear me out... given the following markdown line:
 
 This [emoji] 🍋‍🟩 is a [lime 🍋‍🟩](https://emojipedia.org/lime) ok?
 
-REGEXP will capture too much: "[emoji".."lime)"
+`REGEXP` will capture too much: "[emoji".."lime)"
 My solution is to walk backgrounds through the matched characters.
 I count the nested square bracket groups and end on zero.
 Parentheses in URLs must be URL encoded.
@@ -57,9 +55,33 @@ const reduceMatch = (match: RegExpExecArray) => {
 const plugin: InlinePlugin = {
   type: 'anchor',
   render: async (out: string, options: HmmOptions) => {
+    // Find unprocessed inline code markdown
+    const codeOffsets: Array<[number, number]> = [];
+    if (out.indexOf('`') !== -1) {
+      for (const code of out.matchAll(/`[^`]+`/g)) {
+        codeOffsets.push([code.index, code.index + code[0].length]);
+      }
+    }
     for (const match of out.matchAll(REGEXP)) {
+      // const {0: anchor, 1: text, 2: href} = match;
+      // Get the true match
       const reduced = reduceMatch(match);
       const {anchor, href, text} = reduced;
+
+      // Skip if anchor falls within a code offset
+      if (codeOffsets.length) {
+        const start = match.index + (match[0].length - anchor.length);
+        const end = start + anchor.length;
+        let skip = false;
+        for (const code of codeOffsets) {
+          if (start > code[0] && end < code[1]) {
+            skip = true;
+            break;
+          }
+        }
+        if (skip) continue;
+      }
+
       const props = {text, attributes: {href}};
       props.text = await renderInline(props.text, {
         ...options,
