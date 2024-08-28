@@ -2,6 +2,7 @@
 !.github
 !.gitignore
 !deno.json
+!package.json
 !README.md
 !mod.ts
 !src

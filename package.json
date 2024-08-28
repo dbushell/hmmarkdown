@@ -1,0 +1,24 @@
+{
+  "name": "hmmarkdown",
+  "version": "0.1.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dbushell/hmmarkdown.git"
+  },
+  "description": "Hmmarkdown is a HTML-aware Markdown parser and renderer.",
+  "keywords": [
+    "markdown",
+    "typescript"
+  ],
+  "license": "MIT",
+  "type": "module",
+  "exports": {
+    ".": "./mod.ts",
+    "./types": "./src/types.ts"
+  },
+  "types": "src/types.ts",
+  "files": [
+    "src",
+    "mod.ts"
+  ]
+}
