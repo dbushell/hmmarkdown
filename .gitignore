@@ -9,3 +9,5 @@
 !mod.ts
 !src
 !src/**/*.ts
+!test
+!test/*.ts
