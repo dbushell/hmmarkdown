@@ -76,10 +76,12 @@ export const parse = async (
 
   for await (const block of stream) {
     // Apply pre-render plugins to all lines
-    for (let i = 0; i < block.lines.length; i++) {
-      prerender.forEach((plugin) => {
-        block.lines[i] = plugin.prerender!(block.lines[i], options);
-      });
+    if (block.type !== 'preformatted') {
+      for (let i = 0; i < block.lines.length; i++) {
+        prerender.forEach((plugin) => {
+          block.lines[i] = plugin.prerender!(block.lines[i], options);
+        });
+      }
     }
     // Start block render
     const plugin = options.blockPlugins.find((p) => p.type === block.type)!;
