@@ -1,6 +1,6 @@
 {
   "name": "@dbushell/hmmarkdown",
-  "version": "0.6.0",
+  "version": "0.7.0",
   "exports": {
     ".": "./mod.ts",
     "./types": "./src/types.ts"

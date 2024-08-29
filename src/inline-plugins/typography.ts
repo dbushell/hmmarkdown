@@ -61,7 +61,7 @@ const plugin: InlinePlugin = {
      */
     text = text.replace(
       new RegExp(
-        `(\\s|&nbsp;|--|&[mn]dash;|${DASHES}|&#x201[34])'(?=\\w)`,
+        `(\\*|\\s|&nbsp;|--|&[mn]dash;|${DASHES}|&#x201[34])'(?=\\w)`,
         'g'
       ),
       '$1‘'
@@ -104,7 +104,7 @@ const plugin: InlinePlugin = {
      */
     text = text.replace(
       new RegExp(
-        `(\\s|&nbsp;|--|&[mn]dash;|${DASHES}|&#x201[34])"(?=\\w)`,
+        `(\\*|\\s|&nbsp;|--|&[mn]dash;|${DASHES}|&#x201[34])"(?=\\w)`,
         'g'
       ),
       '$1“'
