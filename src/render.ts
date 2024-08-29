@@ -1,5 +1,6 @@
-import type {HmmNode, HmmOptions} from './types.ts';
-import {flattenNode, mergeNodes, mergeTextNodes, parseNode} from './parse.ts';
+import type {HmmOptions} from './types.ts';
+import type {HmmNode} from './node.ts';
+import {parseNode} from './parse.ts';
 import {inlineElements} from './html.ts';
 import {splitCode} from './utils.ts';
 
@@ -76,17 +77,16 @@ export const renderNode = async (
   options: HmmOptions,
   tag?: string
 ): Promise<{text: string; node: HmmNode}> => {
-  const node = parseNode(text, options, tag);
+  const node = parseNode(text, tag);
   await renderTextNodes(node, options);
   // Merge rendered text inlines nodes
-  mergeNodes(
-    node,
-    options,
+  node.merge(
     (node) => node.type === 'open' && inlineElements.includes(node.tag ?? ''),
     'text'
   );
-  mergeTextNodes(node, options);
+  node.mergeText();
+  // mergeTextNodes(node);
   await renderImageNodes(node, options);
-  text = flattenNode(node, options);
+  text = node.flatten();
   return {text, node};
 };

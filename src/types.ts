@@ -6,14 +6,7 @@ export type HmmBlock = {
   render: string;
 };
 
-/** HTML node */
-export type HmmNode = {
-  children: Array<HmmNode>;
-  parent: HmmNode;
-  text: string;
-  type: 'close' | 'open' | 'root' | 'text' | 'void';
-  tag?: string;
-};
+export type HmmNodeType = 'close' | 'open' | 'root' | 'text' | 'void';
 
 /** Markdown block plugin */
 export type BlockPlugin = {

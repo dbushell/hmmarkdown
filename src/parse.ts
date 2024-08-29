@@ -1,123 +1,23 @@
-import type {HmmNode, HmmOptions} from './types.ts';
-import {parentElements, parseElements, voidElements} from './html.ts';
-
-/** Flatten node and childen to text content */
-export const flattenNode = (root: HmmNode, options: HmmOptions): string => {
-  let text = root.text ?? '';
-  for (const node of root.children) {
-    text += flattenNode(node, options);
-  }
-  return text;
-};
-
-/** Merge node if callback returns true */
-export const mergeNodes = (
-  root: HmmNode,
-  options: HmmOptions,
-  callback: (node: HmmNode) => boolean,
-  type: HmmNode['type'] = 'void'
-): HmmNode => {
-  if (callback(root)) {
-    root.text = flattenNode(root, options);
-    root.type = type;
-    root.children = [];
-  }
-  for (const node of root.children) {
-    mergeNodes(node, options, callback, type);
-  }
-  return root;
-};
-
-/* Merge adjacent text nodes */
-export const mergeTextNodes = (root: HmmNode, options: HmmOptions): void => {
-  const children: Array<HmmNode> = [];
-  let group: HmmNode = {
-    parent: root,
-    type: 'text',
-    text: '',
-    children: []
-  };
-  const flush = () => {
-    if (!group.children.length) {
-      return;
-    }
-    let text = flattenNode(group, options);
-    group.children = [];
-    // Auto-format text nodes with paragraphs and breaks
-    if (parentElements.includes(group.parent.tag!)) {
-      text = text.trim();
-      // Remove excess newlines
-      while (text.includes('\n\n\n')) {
-        text = text.replaceAll('\n\n\n', '\n\n');
-      }
-      // Wrap paragraphs
-      if (text.length) {
-        text = `<p>${text}</p>`;
-        text = text.replaceAll('\n\n', '</p><p>');
-      }
-      // Replace line breaks
-      if (group.parent.tag === 'html') {
-        text = text.replaceAll('\n', '<br>');
-      }
-    }
-    if (text.trim() === '') {
-      return;
-    }
-    group.text = text;
-    children.push(group);
-    group = {
-      parent: root,
-      type: 'text',
-      text: '',
-      children: []
-    };
-  };
-  for (const node of root.children) {
-    if (node.type === 'text') {
-      group.children.push(node);
-    } else {
-      flush();
-      mergeTextNodes(node, options);
-      children.push(node);
-    }
-  }
-  flush();
-  root.children = children;
-};
+import {parseElements, voidElements} from './html.ts';
+import {HmmNode} from './node.ts';
 
 /**
  * Parse text into node tree
  * @param text
  * @returns {HmmNode}
  */
-export const parseNode = (
-  text: string,
-  options: HmmOptions,
-  tag = 'html'
-): HmmNode => {
+export const parseNode = (text: string, tag = 'html'): HmmNode => {
   // Setup root node
-  const root = {
-    type: 'root',
-    tag,
-    children: []
-  } as unknown as HmmNode;
+  const root = new HmmNode(null, 'root', '', tag);
   // Set root as starting parent
   let parent: HmmNode = root;
   // Find first tag
   let offset = text.indexOf('<');
   // Check minimum tag length
   while (offset >= 0 && offset < text.length - 2) {
-    // if (text[offset] !== '<') {
-    //   throw new Error('offset was not "<" symbol');
-    // }
     // Skip to start of tag
     if (offset > 0) {
-      parent.children.push({
-        parent,
-        children: [],
-        type: 'text',
-        text: text.substring(0, offset)
-      });
+      parent.append(new HmmNode(parent, 'text', text.substring(0, offset)));
       text = text.substring(offset);
       offset = 0;
     }
@@ -135,33 +35,26 @@ export const parseNode = (
       tag[0].endsWith('/>') ||
       voidElements.includes(tag[1]);
     if (isVoid) {
-      parent.children.push({
-        type: 'void',
-        text: tag[0],
-        children: [],
-        parent
-      });
+      parent.append(new HmmNode(parent, 'void', tag[0]));
       text = text.substring(tag[0].length);
       offset = text.indexOf('<');
       continue;
     }
     // Opening or closing node?
     const isClose = tag[0].startsWith('</');
-    const node: HmmNode = {
-      type: isClose ? 'close' : 'open',
-      text: tag[0],
-      tag: tag[1],
-      children: [],
-      parent
-    };
+    const node = new HmmNode(
+      parent,
+      isClose ? 'close' : 'open',
+      tag[0],
+      tag[1]
+    );
+    parent.append(node);
     if (isClose) {
-      parent.children.push(node);
       parent = parent.parent;
       if (parent === undefined) {
         throw new Error('descended past root node');
       }
     } else {
-      parent.children.push(node);
       parent = node;
     }
     text = text.substring(tag[0].length);
@@ -169,17 +62,10 @@ export const parseNode = (
   }
   // Append leftover text
   if (text.length) {
-    parent.children.push({
-      text,
-      type: 'text',
-      children: [],
-      parent
-    });
+    parent.append(new HmmNode(parent, 'text', text));
   }
   // Merge void and unparsable nodes
-  mergeNodes(
-    root,
-    options,
+  root.merge(
     (node: HmmNode) =>
       node.type === 'open' && !parseElements.includes(node.tag ?? '')
   );
