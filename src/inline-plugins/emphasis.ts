@@ -1,5 +1,6 @@
 import type {InlinePlugin} from '../types.ts';
 
+// Allow underscore syntax but don't tell anyone
 const REGEXP = /(\*|_)(.+?)\1/g;
 
 const plugin: InlinePlugin = {

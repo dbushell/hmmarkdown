@@ -1,6 +1,6 @@
 import type {InlinePlugin, HmmOptions} from '../types.ts';
 import {renderInline} from '../render.ts';
-import {replace} from '../utils.ts';
+import {replace2} from '../utils.ts';
 import {escape} from '../vendor/std-html.ts';
 
 const REGEXP = /(?<!\!)\[(.+?)\]\(([^()\s]+)\)/g;
@@ -94,7 +94,7 @@ const plugin: InlinePlugin = {
       const attr = Object.entries(props.attributes)
         .map(([k, v]) => `${k}="${escape(v)}"`)
         .join(' ');
-      out = replace(out, anchor, `<a ${attr}>${props.text}</a>`);
+      out = replace2(out, anchor, `<a ${attr}>${props.text}</a>`);
     }
     return out;
   }

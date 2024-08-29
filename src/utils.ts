@@ -28,14 +28,16 @@ export const splitCode = async (
 };
 
 /** String replace without side effects */
-export const replace = (
+export const replace2 = (
   subject: string,
   search: string,
-  replace = '',
-  all = false
+  replace = ''
 ): string => {
-  let parts = subject.split(search);
-  if (parts.length === 1) return subject;
-  if (!all) parts = [parts.shift()!, parts.join(search)];
-  return parts.join(replace);
+  const offset = subject.indexOf(search);
+  if (offset === -1) return subject;
+  return (
+    subject.substring(0, offset) +
+    replace +
+    subject.substring(search.length + offset)
+  );
 };
