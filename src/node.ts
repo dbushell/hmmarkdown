@@ -69,12 +69,15 @@ export class HmmNode {
         }
         // Wrap paragraphs
         if (text.length) {
-          text = `<p>${text}</p>`;
-          text = text.replaceAll('\n\n', '</p><p>');
-        }
-        // Replace line breaks
-        if (group.parent.tag === 'html') {
-          text = text.replaceAll('\n', '<br>');
+          const lines = text.split('\n\n');
+          text = '';
+          for (let line of lines) {
+            if (!line.length) continue;
+            if (group.parent.tag === 'html') {
+              line = line.replaceAll('\n', '<br>');
+            }
+            text += `<p>${line}</p>`;
+          }
         }
       }
       if (text.trim() === '') {
