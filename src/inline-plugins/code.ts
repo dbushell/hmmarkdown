@@ -7,7 +7,7 @@ const REGEXP = /`([^`]+)`/g;
 const plugin: InlinePlugin = {
   type: 'code',
   prerender: (text: string) => {
-    if (text.indexOf('`') < 0) return text;
+    if (text.indexOf('`') === -1) return text;
     // Inline code is escaped early to avoid `<div>` being parsed as HTML node
     for (const match of text.matchAll(REGEXP)) {
       text = replace2(text, match[0], escape(match[0]));

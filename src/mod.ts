@@ -19,6 +19,7 @@ import inlineCode from './inline-plugins/code.ts';
 import inlineDeleted from './inline-plugins/deleted.ts';
 import inlineEmphasis from './inline-plugins/emphasis.ts';
 import inlineEscape from './inline-plugins/escape.ts';
+import inlineImage from './inline-plugins/image.ts';
 import inlineStrong from './inline-plugins/strong.ts';
 import inlineTypography from './inline-plugins/typography.ts';
 
@@ -38,6 +39,7 @@ export const defaultOptions: HmmOptions = {
   inlinePlugins: [
     inlineTypography,
     inlineEscape,
+    inlineImage,
     inlineAnchor,
     inlineCode,
     inlineStrong,
@@ -98,3 +100,6 @@ export const hmmarkdown = async (
   const blocks = await parse(input, options);
   return (await Promise.all(blocks)).join('');
 };
+
+export const hmmtypography = (input: string): Promise<string> =>
+  inlineTypography.render(input, defaultOptions);

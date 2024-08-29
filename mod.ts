@@ -1,4 +1,9 @@
-export {defaultOptions, hmmarkdown, hmmarkdown as default} from './src/mod.ts';
+export {
+  defaultOptions,
+  hmmtypography,
+  hmmarkdown,
+  hmmarkdown as default
+} from './src/mod.ts';
 export type {
   HmmBlock,
   BlockPlugin,
