@@ -85,7 +85,6 @@ export const renderNode = async (
     'text'
   );
   node.mergeText();
-  // mergeTextNodes(node);
   await renderImageNodes(node, options);
   text = node.flatten();
   return {text, node};

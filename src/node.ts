@@ -61,7 +61,7 @@ export class HmmNode {
       }
       let text = group.flatten();
       // Auto-format text nodes with paragraphs and breaks
-      if (parentElements.includes(group.parent.tag!)) {
+      if (parentElements.includes(group.parent.tag)) {
         text = text.trim();
         // Remove excess newlines
         while (text.includes('\n\n\n')) {

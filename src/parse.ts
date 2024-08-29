@@ -1,11 +1,7 @@
 import {parseElements, voidElements} from './html.ts';
 import {HmmNode} from './node.ts';
 
-/**
- * Parse text into node tree
- * @param text
- * @returns {HmmNode}
- */
+/** Parse text into node tree */
 export const parseNode = (text: string, tag = 'html'): HmmNode => {
   // Setup root node
   const root = new HmmNode(null, 'root', '', tag);
