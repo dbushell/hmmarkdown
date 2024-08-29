@@ -24,16 +24,16 @@ Acceptable fails:
 
 */
 const reduceMatch = (match: RegExpExecArray) => {
-  let anchor = '';
-  let href = '';
-  let text = '';
+  const anchor = [];
+  const href = [];
+  const text = [];
   let startHref = false;
   let startText = false;
   for (let end = -1, i = match[0].length - 1; i >= 0; i--) {
     const char = match[0][i];
-    anchor += char;
-    if (startHref) href += char;
-    if (startText) text += char;
+    anchor.push(char);
+    if (startHref) href.push(char);
+    if (startText) text.push(char);
     if (!startText) {
       if (char === ')') startHref = true;
       if (char === '(') {
@@ -46,9 +46,9 @@ const reduceMatch = (match: RegExpExecArray) => {
     if (end === 0) break;
   }
   return {
-    anchor: [...anchor].reverse().join(''),
-    href: [...href.slice(0, -1)].reverse().join(''),
-    text: [...text.slice(1, -1)].reverse().join('')
+    anchor: anchor.reverse().join(''),
+    href: href.reverse().slice(1).join(''),
+    text: text.reverse().slice(1, -1).join('')
   };
 };
 
