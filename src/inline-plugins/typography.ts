@@ -64,7 +64,7 @@ const plugin: InlinePlugin = {
         `(\\*|\\s|&nbsp;|--|&[mn]dash;|${DASHES}|&#x201[34])'(?=\\w)`,
         'g'
       ),
-      '$1‘'
+      (...match) => `${match[1]}‘`
     );
 
     /**
@@ -80,7 +80,10 @@ const plugin: InlinePlugin = {
      * } {$1’}xgi;
      */
     text = text.replace(new RegExp(`(${CLOSE})'`, 'g'), '$1’');
-    text = text.replace(new RegExp(`(${NOT_CLOSE}?)'(?=\\s|s\\b)`, 'g'), '$1’');
+    text = text.replace(
+      new RegExp(`(${NOT_CLOSE}?)'(?=\\s|s\\b)`, 'g'),
+      (...match) => `${match[1]}’`
+    );
 
     /**
      * Any remaining single quotes should be opening ones:
@@ -107,7 +110,7 @@ const plugin: InlinePlugin = {
         `(\\*|\\s|&nbsp;|--|&[mn]dash;|${DASHES}|&#x201[34])"(?=\\w)`,
         'g'
       ),
-      '$1“'
+      (...match) => `${match[1]}“`
     );
 
     /**
@@ -119,8 +122,14 @@ const plugin: InlinePlugin = {
      *                        # if not, then make sure the next char is whitespace.
      * } {$1”;}xg;
      */
-    text = text.replace(new RegExp(`(${CLOSE})"`, 'g'), '$1”');
-    text = text.replace(new RegExp(`(${NOT_CLOSE}?)"(?=\\s)`, 'g'), '$1”');
+    text = text.replace(
+      new RegExp(`(${CLOSE})"`, 'g'),
+      (...match) => `${match[1]}”`
+    );
+    text = text.replace(
+      new RegExp(`(${NOT_CLOSE}?)"(?=\\s)`, 'g'),
+      (...match) => `${match[1]}”`
+    );
 
     /**
      * Any remaining quotes should be opening ones.

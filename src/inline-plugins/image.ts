@@ -1,5 +1,4 @@
 import type {HmmOptions, InlinePlugin} from '../types.ts';
-import {replace2} from '../utils.ts';
 import {escape} from '../vendor/std-html.ts';
 
 const REGEXP = /!\[([^\]]+)\]\(([^()\s]+)\)/g;
@@ -24,10 +23,9 @@ const plugin: InlinePlugin = {
       const attr = Object.entries(props.attributes)
         .map(([k, v]) => `${k}="${escape(v)}"`)
         .join(' ');
-      text = replace2(
-        text,
+      text = text.replace(
         match[0],
-        `${props.before}<img ${attr}>${props.after}`
+        () => `${props.before}<img ${attr}>${props.after}`
       );
     }
     return Promise.resolve(text);

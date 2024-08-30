@@ -1,5 +1,4 @@
 import type {InlinePlugin} from '../types.ts';
-import {replace2} from '../utils.ts';
 
 // Allow underscore syntax but don't tell anyone
 const REGEXP = /(\*\*|__)(.+?)\1/g;
@@ -25,10 +24,9 @@ const plugin: InlinePlugin = {
         }
       }
       const length = text.length;
-      text = replace2(
-        text,
+      text = text.replace(
         search + extra,
-        `<strong>${match[2]}${extra}</strong>`
+        () => `<strong>${match[2]}${extra}</strong>`
       );
       startOffset += text.length - length;
     }

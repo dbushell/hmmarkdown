@@ -26,18 +26,3 @@ export const splitCode = async (
   }
   return text;
 };
-
-/** String replace without side effects */
-export const replace2 = (
-  subject: string,
-  search: string,
-  replace = ''
-): string => {
-  const offset = subject.indexOf(search);
-  if (offset === -1) return subject;
-  return (
-    subject.substring(0, offset) +
-    replace +
-    subject.substring(search.length + offset)
-  );
-};
