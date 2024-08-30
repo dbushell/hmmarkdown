@@ -21,9 +21,7 @@ const entityList: EntityList = Object.fromEntries([
 const plugin: InlinePlugin = {
   type: 'escape',
   render: (text: string) => {
-    text = unescape(text, {
-      entityList
-    });
+    text = unescape(text, {entityList});
     text = escape(text);
     return Promise.resolve(text);
   }

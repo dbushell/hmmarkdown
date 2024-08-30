@@ -8,15 +8,10 @@ const plugin: InlinePlugin = {
   prerender: (text: string) => {
     if (text.indexOf('`') === -1) return text;
     // Inline code is escaped early to avoid `<div>` being parsed as HTML node
-    for (const match of text.matchAll(REGEXP)) {
-      text = text.replace(match[0], () => escape(match[0]));
-    }
-    return text;
+    return text.replace(REGEXP, (...match) => escape(match[0]));
   },
   render: (text: string) => {
-    for (const match of text.matchAll(REGEXP)) {
-      text = text.replace(match[0], () => `<code>${match[1]}</code>`);
-    }
+    text = text.replace(REGEXP, (...match) => `<code>${match[1]}</code>`);
     return Promise.resolve(text);
   }
 };
