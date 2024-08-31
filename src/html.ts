@@ -74,7 +74,7 @@ export const parentElements = [
 ];
 Object.freeze(parentElements);
 
-/** Elements to parse for markdown text content */
+/** Elements to parse for Markdown text content */
 export const parseElements = [
   ...inlineElements,
   ...parentElements,

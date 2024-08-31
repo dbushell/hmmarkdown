@@ -6,6 +6,7 @@ export type HmmBlock = {
   render: string;
 };
 
+/** HmmNode type */
 export type HmmNodeType = 'close' | 'open' | 'root' | 'text' | 'void';
 
 /** Markdown block plugin */

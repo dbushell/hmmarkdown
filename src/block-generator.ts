@@ -1,5 +1,6 @@
 import type {HmmBlock, HmmOptions} from './types.ts';
 
+/** Parse lines and yield Markdown blocks */
 export async function* blockGenerator(
   allLines: Array<string>,
   options: HmmOptions

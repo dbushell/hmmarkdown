@@ -1,5 +1,6 @@
 import type {HmmBlock, HmmOptions} from './types.ts';
 
+/** Transform lines and queue Markdown blocks */
 export class BlockStream extends TransformStream<string, HmmBlock> {
   constructor(options: HmmOptions) {
     // Buffers

@@ -101,5 +101,6 @@ export const hmmarkdown = async (
   return (await Promise.all(blocks)).join('');
 };
 
+/** Apply typography inline plugin */
 export const hmmtypography = (input: string): Promise<string> =>
   inlineTypography.render(input, defaultOptions);
