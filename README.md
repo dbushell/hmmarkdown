@@ -21,7 +21,7 @@
 
 ## Development
 
-Hmmarkdown is under active development. It is not stable or "production ready" — although I am **testing in production** ([on my website](https://dbushell.com)).
+[Hmmarkdown is under active development](https://dbushell.com/2024/09/01/hmmarkdown/). It is not stable or "production ready" — although I am **testing in production** ([on my website](https://dbushell.com)).
 
 ## Block Syntax
 
@@ -68,7 +68,9 @@ Spaces between characters are optional. Spaces around characters are not allowed
 ![alternate description](https://example.com/image.jpg)
 ```
 
-URL **spaces** and **parentheses** must be URI encoded. Alternate text cannot include square brackets (`[` or `]`).
+`![alt](%20%28image%29.jpg)` — URL **spaces** and **parentheses** must be URL encoded.
+
+Alternate text cannot include square brackets (`[` or `]`).
 
 ```html
 <img alt="" src="https://example.com/image.jpg">
