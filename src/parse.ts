@@ -31,7 +31,7 @@ export const parseNode = (text: string, tag = 'html'): HmmNode => {
       tag[0].endsWith('/>') ||
       voidElements.includes(tag[1]);
     if (isVoid) {
-      parent.append(new HmmNode(parent, 'void', tag[0]));
+      parent.append(new HmmNode(parent, 'void', tag[0], tag[1]));
       text = text.substring(tag[0].length);
       offset = text.indexOf('<');
       continue;

@@ -26,6 +26,7 @@ const plugin: BlockPlugin = {
       before: '',
       after: ''
     };
+    /** @todo Fix this hack? */
     if (typeof block.matches[2] === 'object') {
       props.attributes = {
         ...props.attributes,
@@ -35,6 +36,7 @@ const plugin: BlockPlugin = {
     const filter = options.blockFilters.image;
     if (filter) await filter(props);
     const attr = Object.entries(props.attributes)
+      .filter(([k]) => !k.startsWith('_'))
       .map(([k, v]) => `${k}="${escape(v)}"`)
       .join(' ');
     block.render = `${props.before}<img ${attr}>${props.after}`;

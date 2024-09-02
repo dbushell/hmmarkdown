@@ -21,6 +21,7 @@ const plugin: InlinePlugin = {
       const filter = options.blockFilters.image;
       if (filter) await filter(props);
       const attr = Object.entries(props.attributes)
+        .filter(([k]) => !k.startsWith('_'))
         .map(([k, v]) => `${k}="${escape(v)}"`)
         .join(' ');
       text = text.replace(

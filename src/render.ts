@@ -47,28 +47,36 @@ export const renderImageNodes = async (
     (plugin) => plugin.type === 'image'
   );
   if (!imagePlugin) return;
+  const work: Array<Promise<void>> = [];
   for (const node of root.children) {
-    if (node.type === 'void' && node.text.startsWith('<img')) {
-      node.text = node.text.replaceAll('\n', ' ');
-      const attributes: Record<string, string> = {};
-      const regex = /([\w:.-]+)\s*=\s*(["'])(.*?)\2/g;
-      let match: RegExpExecArray | null;
-      while ((match = regex.exec(node.text)) !== null) {
-        attributes[match[1]] = match[3];
-      }
-      if (!attributes.src) continue;
-      node.text = await imagePlugin.render(
-        {
-          type: 'image',
-          lines: [node.text],
-          /** @todo Fix this hack? */
-          matches: ['', '', attributes as unknown as string],
-          render: ''
-        },
-        options
-      );
+    if (node.children.length) {
+      work.push(renderImageNodes(node, options));
     }
+    if (node.tag !== 'img') {
+      continue;
+    }
+    node.text = node.text.replaceAll('\n', ' ');
+    const attributes: Record<string, string> = {};
+    const regex = /([\w:.-]+)\s*=\s*(["'])(.*?)\2/g;
+    let match: RegExpExecArray | null;
+    while ((match = regex.exec(node.text)) !== null) {
+      attributes[match[1]] = match[3];
+    }
+    if (!attributes.src) continue;
+    /** @todo Fix this hack? */
+    attributes._parentTag = node.parent.tag ?? '';
+    node.text = await imagePlugin.render(
+      {
+        type: 'image',
+        lines: [node.text],
+        /** @todo Fix this hack? */
+        matches: ['', '', attributes as unknown as string],
+        render: ''
+      },
+      options
+    );
   }
+  await Promise.all(work);
 };
 
 /** Parse and render inline HTML and Markdown */
