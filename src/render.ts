@@ -30,7 +30,9 @@ export const renderTextNodes = async (
   node: Node,
   options: HmmOptions,
 ): Promise<void> => {
+  if (node.tag === "pre") return;
   if (node.tag === "code") return;
+  if (node.type === "OPAQUE") return;
   if (node.type === "TEXT") {
     node.raw = await renderInline(node.raw, options);
     return;
