@@ -1,9 +1,9 @@
-import type {HmmBlock, HmmOptions} from './types.ts';
+import type { HmmBlock, HmmOptions } from "./types.ts";
 
 /** Parse lines and yield Markdown blocks */
 export async function* blockGenerator(
   allLines: Array<string>,
-  options: HmmOptions
+  options: HmmOptions,
 ): AsyncGenerator<HmmBlock, void, void> {
   // Buffers
   let type: string | undefined;
@@ -15,17 +15,17 @@ export async function* blockGenerator(
     // Work with previous multi-line block
     if (type) {
       const plugin = options.blockPlugins.find((p) => p.type === type);
-      if (plugin === undefined) throw new Error('undefined plugin');
+      if (plugin === undefined) throw new Error("undefined plugin");
       // Check for end of multi-line block
       if (plugin.matchEnd) {
         lines.push(line);
         if (plugin.matchEnd(line)) {
-          if (type === undefined) throw new Error('undefined type');
+          if (type === undefined) throw new Error("undefined type");
           yield {
             type,
             lines,
             matches,
-            render: ''
+            render: "",
           };
           type = undefined;
           lines = [];
@@ -38,12 +38,12 @@ export async function* blockGenerator(
         lines.push(line);
         continue;
       }
-      if (type === undefined) throw new Error('undefined type');
+      if (type === undefined) throw new Error("undefined type");
       yield {
         type,
         lines,
         matches: matches,
-        render: ''
+        render: "",
       };
       type = undefined;
       lines = [];
@@ -63,9 +63,9 @@ export async function* blockGenerator(
       if (lines.length) {
         yield {
           lines,
-          type: 'paragraph',
+          type: "paragraph",
           matches: [],
-          render: ''
+          render: "",
         };
         lines = [];
       }
@@ -75,7 +75,12 @@ export async function* blockGenerator(
         lines.push(line);
         break;
       }
-      yield {type: plugin.type, matches: newMatches, lines: [line], render: ''};
+      yield {
+        type: plugin.type,
+        matches: newMatches,
+        lines: [line],
+        render: "",
+      };
       break;
     }
     // Continue with default paragraph block
@@ -87,9 +92,9 @@ export async function* blockGenerator(
   if (lines.length) {
     yield {
       lines,
-      type: type ?? 'paragraph',
+      type: type ?? "paragraph",
       matches: [],
-      render: ''
+      render: "",
     };
   }
 }

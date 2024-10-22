@@ -1,7 +1,7 @@
 /** Perform replace on string parts ignoring inline code */
 export const splitCode = async (
   text: string,
-  replace: (part: string) => Promise<string>
+  replace: (part: string) => Promise<string>,
 ): Promise<string> => {
   // Split text by inline `code` syntax
   const codes: Array<string> = [];
@@ -18,11 +18,11 @@ export const splitCode = async (
     parts.push(part.substring(offset + match[0].length));
   }
   // Join rendered parts back with codes
-  text = '';
+  text = "";
   for (let i = 0; i < parts.length; i++) {
     let part = parts[i];
     part = await replace(part);
-    text += part + (codes[i] ?? '');
+    text += part + (codes[i] ?? "");
   }
   return text;
 };

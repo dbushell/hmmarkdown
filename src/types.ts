@@ -6,9 +6,6 @@ export type HmmBlock = {
   render: string;
 };
 
-/** HmmNode type */
-export type HmmNodeType = 'close' | 'open' | 'root' | 'text' | 'void';
-
 /** Markdown block plugin */
 export type BlockPlugin = {
   type: string;
@@ -29,21 +26,4 @@ export type InlinePlugin = {
 export type HmmOptions = {
   blockPlugins: Array<BlockPlugin>;
   inlinePlugins: Array<InlinePlugin>;
-  blockFilters: {
-    image?: (props: {
-      attributes: Record<string, string> & {alt: string; src: string};
-      before: string;
-      after: string;
-    }) => Promise<void>;
-    preformatted?: (props: {
-      code: string;
-      attributes: Record<string, string> & {'data-lang': string};
-    }) => Promise<void>;
-  };
-  inlineFilters: {
-    anchor?: (props: {
-      text: string;
-      attributes: Record<string, string>;
-    }) => Promise<void>;
-  };
 };

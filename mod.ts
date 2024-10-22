@@ -1,12 +1,12 @@
 export {
   defaultOptions,
-  hmmtypography,
   hmmarkdown,
-  hmmarkdown as default
-} from './src/mod.ts';
+  hmmarkdown as default,
+  hmmtypography,
+} from "./src/mod.ts";
 export type {
-  HmmBlock,
   BlockPlugin,
+  HmmBlock,
+  HmmOptions,
   InlinePlugin,
-  HmmOptions
-} from './src/types.ts';
+} from "./src/types.ts";

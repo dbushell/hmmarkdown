@@ -16,8 +16,7 @@
 
 * Accepts a `string` or stream (e.g. `Response.body`)
 * Processes some *HTML-in-Markdown* and *Markdown-in-HTML*
-* Asynchronous plugin and filter architecture
-* MIT licensed / zero-dependency
+* Asynchronous architecture
 
 ## Development
 

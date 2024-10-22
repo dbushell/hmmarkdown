@@ -1,30 +1,34 @@
-import type {InlinePlugin} from '../types.ts';
-import {escape, unescape, type EntityList} from '../vendor/std-html.ts';
+import type { InlinePlugin } from "../types.ts";
+import { escape } from "@dbushell/hyperless";
 
-const entityList: EntityList = Object.fromEntries([
-  // Initial list
-  ['&amp;', '&'],
-  ['&lt;', '<'],
-  ['&gt;', '>'],
-  ['&quot;', '"'],
-  ['&#39;', "'"],
-  // Original list
-  ['&apos;', "'"],
-  ['&nbsp;', '\xa0'],
-  // Extended list
-  ['&ndash;', '–'],
-  ['&mdash;', '—'],
-  ['&copy;', '©'],
-  ['&hellip;', '…']
+const entities = new Map([
+  ["&", "&amp;"],
+  ["<", "&lt;"],
+  [">", "&gt;"],
+  ['"', "&quot;"],
+  ["'", "&#39;"],
+  ["'", "&apos;"],
+  ["\xa0", "&nbsp;"],
+  ["–", "&ndash;"],
+  ["—", "&mdash;"],
+  ["©", "&copy;"],
+  ["…", "&hellip;"],
 ]);
 
+const encodes = new Map(Array.from(entities, ([k, v]) => [v, k]));
+
+const encodedKeys = new RegExp([...encodes.keys()].join("|"), "g");
+
+const unescape = (str: string): string =>
+  str.replaceAll(encodedKeys, (k) => encodes.get(k)!);
+
 const plugin: InlinePlugin = {
-  type: 'escape',
+  type: "escape",
   render: (text: string) => {
-    text = unescape(text, {entityList});
+    text = unescape(text);
     text = escape(text);
     return Promise.resolve(text);
-  }
+  },
 };
 
 export default plugin;

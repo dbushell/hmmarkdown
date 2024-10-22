@@ -1,7 +1,7 @@
-import {hmmarkdown} from '../mod.ts';
-import {assertEquals} from 'jsr:@std/assert';
+import { hmmarkdown } from "../mod.ts";
+import { assertEquals } from "jsr:@std/assert";
 
-Deno.test('block list (unordered)', async () => {
+Deno.test("block list (unordered)", async () => {
   const html = await hmmarkdown(`
 * one
 * *two*
@@ -17,16 +17,16 @@ Deno.test('block list (unordered)', async () => {
   <li><em>two</em></li>
   <li><strong>three</strong></li>
   <li><del>four</del>
-      <br>    four 🍋‍🟩 sentence</li>
+      <br/>    four 🍋‍🟩 sentence</li>
   <li>five <a href="/link">link</a></li>
 </ul>`
-      .split('\n')
+      .split("\n")
       .map((p) => p.trim())
-      .join('')
+      .join(""),
   );
 });
 
-Deno.test('block list (ordered)', async () => {
+Deno.test("block list (ordered)", async () => {
   const html = await hmmarkdown(`
 1. one
 2. *two*
@@ -42,11 +42,11 @@ Deno.test('block list (ordered)', async () => {
   <li><em>two</em></li>
   <li><strong>three</strong></li>
   <li><del>four</del>
-      <br>    four 🍋‍🟩 sentence</li>
+      <br/>    four 🍋‍🟩 sentence</li>
   <li>five <a href="/link">link</a></li>
 </ol>`
-      .split('\n')
+      .split("\n")
       .map((p) => p.trim())
-      .join('')
+      .join(""),
   );
 });

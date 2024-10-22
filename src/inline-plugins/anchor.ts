@@ -1,11 +1,11 @@
-import type {InlinePlugin, HmmOptions} from '../types.ts';
-import {renderInline} from '../render.ts';
-import {escape} from '../vendor/std-html.ts';
+import type { HmmOptions, InlinePlugin } from "../types.ts";
+import { renderInline } from "../render.ts";
+import { escape } from "@dbushell/hyperless";
 
 const REGEXP = /(?<!\!)\[(.+?)\]\(([^()\s]+)\)/g;
 
 // Apply to anchor text content
-const inlinePlugins = ['deleted', 'emphasis', 'strong'];
+const inlinePlugins = ["deleted", "emphasis", "strong"];
 
 /**
 Okay hear me out... given the following markdown line:
@@ -34,39 +34,37 @@ const reduceMatch = (match: RegExpExecArray) => {
     if (startHref) href.push(char);
     if (startText) text.push(char);
     if (!startText) {
-      if (char === ')') startHref = true;
-      if (char === '(') {
+      if (char === ")") startHref = true;
+      if (char === "(") {
         startHref = false;
         startText = true;
       }
     }
-    if (char === ']') end = end === -1 ? 1 : end + 1;
-    if (char === '[') end--;
+    if (char === "]") end = end === -1 ? 1 : end + 1;
+    if (char === "[") end--;
     if (end === 0) break;
   }
   return {
-    anchor: anchor.reverse().join(''),
-    href: href.reverse().slice(1).join(''),
-    text: text.reverse().slice(1, -1).join('')
+    anchor: anchor.reverse().join(""),
+    href: href.reverse().slice(1).join(""),
+    text: text.reverse().slice(1, -1).join(""),
   };
 };
 
 const plugin: InlinePlugin = {
-  type: 'anchor',
+  type: "anchor",
   render: async (out: string, options: HmmOptions) => {
     // Find unprocessed inline code markdown
     const codeOffsets: Array<[number, number]> = [];
-    if (out.indexOf('`') !== -1) {
+    if (out.indexOf("`") !== -1) {
       for (const code of out.matchAll(/`[^`]+`/g)) {
         codeOffsets.push([code.index, code.index + code[0].length]);
       }
     }
     for (const match of out.matchAll(REGEXP)) {
-      // const {0: anchor, 1: text, 2: href} = match;
       // Get the true match
       const reduced = reduceMatch(match);
-      const {anchor, href, text} = reduced;
-
+      let { anchor, href, text } = reduced;
       // Skip if anchor falls within a code offset
       if (codeOffsets.length) {
         const start = match.index + (match[0].length - anchor.length);
@@ -80,23 +78,16 @@ const plugin: InlinePlugin = {
         }
         if (skip) continue;
       }
-
-      const props = {text, attributes: {href}};
-      props.text = await renderInline(props.text, {
+      text = await renderInline(text, {
         ...options,
         inlinePlugins: options.inlinePlugins.filter((plugin) =>
           inlinePlugins.includes(plugin.type)
-        )
+        ),
       });
-      const filter = options.inlineFilters.anchor;
-      if (filter) await filter(props);
-      const attr = Object.entries(props.attributes)
-        .map(([k, v]) => `${k}="${escape(v)}"`)
-        .join(' ');
-      out = out.replace(anchor, () => `<a ${attr}>${props.text}</a>`);
+      out = out.replace(anchor, () => `<a href="${escape(href)}">${text}</a>`);
     }
     return out;
-  }
+  },
 };
 
 export default plugin;

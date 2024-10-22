@@ -1,4 +1,4 @@
-import type {HmmBlock, HmmOptions} from './types.ts';
+import type { HmmBlock, HmmOptions } from "./types.ts";
 
 /** Transform lines and queue Markdown blocks */
 export class BlockStream extends TransformStream<string, HmmBlock> {
@@ -14,21 +14,21 @@ export class BlockStream extends TransformStream<string, HmmBlock> {
         if (lines.length) {
           controller.enqueue({
             lines,
-            type: type ?? 'paragraph',
+            type: type ?? "paragraph",
             matches: [],
-            render: ''
+            render: "",
           });
         }
       },
       transform: (line, controller) => {
         // Flush multi-line block and reset parser
         const flushBuffer = () => {
-          if (type === undefined) throw new Error('undefined type');
+          if (type === undefined) throw new Error("undefined type");
           controller.enqueue({
             type,
             lines,
             matches,
-            render: ''
+            render: "",
           });
           type = undefined;
           lines = [];
@@ -37,7 +37,7 @@ export class BlockStream extends TransformStream<string, HmmBlock> {
         // Work with previous multi-line block
         if (type) {
           const plugin = options.blockPlugins.find((p) => p.type === type);
-          if (plugin === undefined) throw new Error('undefined plugin');
+          if (plugin === undefined) throw new Error("undefined plugin");
           // Check for end of multi-line block
           if (plugin.matchEnd) {
             lines.push(line);
@@ -65,9 +65,9 @@ export class BlockStream extends TransformStream<string, HmmBlock> {
           if (lines.length) {
             controller.enqueue({
               lines,
-              type: 'paragraph',
+              type: "paragraph",
               matches: [],
-              render: ''
+              render: "",
             });
             lines = [];
           }
@@ -81,13 +81,13 @@ export class BlockStream extends TransformStream<string, HmmBlock> {
             type: plugin.type,
             matches: newMatches,
             lines: [line],
-            render: ''
+            render: "",
           });
           return;
         }
         // Continue with default paragraph block
         lines.push(line);
-      }
+      },
     });
   }
 }

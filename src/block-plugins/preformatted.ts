@@ -1,40 +1,28 @@
-import type {HmmBlock, BlockPlugin, HmmOptions} from '../types.ts';
-import {escape} from '../vendor/std-html.ts';
+import type { BlockPlugin, HmmBlock } from "../types.ts";
+import { escape } from "@dbushell/hyperless";
 
 const REGEXP = /^```\s?(\w*)\s*$/;
 
 const plugin: BlockPlugin = {
-  type: 'preformatted',
+  type: "preformatted",
   multiline: true,
   matchStart: (line: string): false | Array<string> => {
-    if (line[0] !== '`') return false;
-    if (line[1] !== '`') return false;
-    if (line[2] !== '`') return false;
+    if (line[0] !== "`") return false;
+    if (line[1] !== "`") return false;
+    if (line[2] !== "`") return false;
     const match = line.match(REGEXP);
     return match ? [match[1]] : false;
   },
   matchEnd: (line: string): boolean => {
-    return line === '```';
+    return line === "```";
   },
-  render: async (block: HmmBlock, options: HmmOptions): Promise<string> => {
-    const code = block.lines.slice(1, block.lines.length - 1).join('\n');
-    const props = {
-      code,
-      attributes: {
-        'data-lang': block.matches[0],
-        tabindex: '0'
-      }
-    };
-    const filter = options.blockFilters.preformatted;
-    if (filter) await filter(props);
-    const attr = Object.entries(props.attributes)
-      .map(([k, v]) => `${k}="${escape(v)}"`)
-      .join(' ');
-    block.render = `<pre ${attr}>`;
-    block.render += `<code>${props.code}</code>`;
+  render: (block: HmmBlock): Promise<string> => {
+    const code = block.lines.slice(1, block.lines.length - 1).join("\n");
+    block.render = `<pre data-lang="${escape(block.matches[0])}" tabindex="0">`;
+    block.render += `<code>${escape(code)}</code>`;
     block.render += `</pre>`;
-    return block.render;
-  }
+    return Promise.resolve(block.render);
+  },
 };
 
 export default plugin;

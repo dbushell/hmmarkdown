@@ -1,16 +1,22 @@
-import type {HmmOptions} from './types.ts';
-import type {HmmNode} from './node.ts';
-import {parseNode} from './parse.ts';
-import {inlineElements} from './html.ts';
-import {splitCode} from './utils.ts';
+import type { HmmOptions } from "./types.ts";
+import {
+  getParseOptions,
+  inlineTags,
+  Node,
+  parseHTML,
+} from "@dbushell/hyperless";
+import { splitCode } from "./utils.ts";
+import { parentTags, parseTags } from "./html.ts";
+
+const parseOptions = getParseOptions();
 
 /** Render inline Markdown */
 export const renderInline = async (
   text: string,
-  options: HmmOptions
+  options: HmmOptions,
 ): Promise<string> => {
   for (const plugin of options.inlinePlugins) {
-    if (['anchor', 'code'].includes(plugin.type)) {
+    if (["anchor", "code"].includes(plugin.type)) {
       text = await plugin.render(text, options);
     } else {
       text = await splitCode(text, (part) => plugin.render(part, options));
@@ -21,79 +27,96 @@ export const renderInline = async (
 
 /** Apply inline render to text nodes */
 export const renderTextNodes = async (
-  root: HmmNode,
-  options: HmmOptions
+  node: Node,
+  options: HmmOptions,
 ): Promise<void> => {
-  if (root.tag === 'code') return;
-  if (root.type === 'text') {
-    root.text = await renderInline(root.text, options);
-  }
-  if (root.children.length === 0) {
+  if (node.tag === "code") return;
+  if (node.type === "TEXT") {
+    node.raw = await renderInline(node.raw, options);
     return;
   }
-  const work = [];
-  for (const node of root.children) {
-    work.push(renderTextNodes(node, options));
-  }
-  await Promise.all(work);
+  await Promise.all(
+    node.children.map((child) => renderTextNodes(child, options)),
+  );
 };
 
 /** Apply image render to top-level HTML `<img>` nodes */
-export const renderImageNodes = async (
-  root: HmmNode,
-  options: HmmOptions
-): Promise<void> => {
-  const imagePlugin = options.blockPlugins.find(
-    (plugin) => plugin.type === 'image'
-  );
-  if (!imagePlugin) return;
-  const work: Array<Promise<void>> = [];
-  for (const node of root.children) {
-    if (node.children.length) {
-      work.push(renderImageNodes(node, options));
-    }
-    if (node.tag !== 'img') {
+
+// Convert inline tags to text nodes
+const mergeText = (n: Node) => {
+  for (const child of [...n.children]) {
+    if (child.type === "OPAQUE") {
       continue;
     }
-    node.text = node.text.replaceAll('\n', ' ');
-    const attributes: Record<string, string> = {};
-    const regex = /([\w:.-]+)\s*=\s*(["'])(.*?)\2/g;
-    let match: RegExpExecArray | null;
-    while ((match = regex.exec(node.text)) !== null) {
-      attributes[match[1]] = match[3];
+    mergeText(child);
+    // Merge adjacent text nodes
+    if (child.type === "TEXT" && child.previous?.type === "TEXT") {
+      child.previous.raw += child.toString();
+      child.detach();
+      continue;
     }
-    if (!attributes.src) continue;
-    /** @todo Fix this hack? */
-    attributes._parentTag = node.parent.tag ?? '';
-    node.text = await imagePlugin.render(
-      {
-        type: 'image',
-        lines: [node.text],
-        /** @todo Fix this hack? */
-        matches: ['', '', attributes as unknown as string],
-        render: ''
-      },
-      options
-    );
+    if (inlineTags.has(child.tag)) {
+      // Merge inline into previous text node
+      if (child.previous?.type === "TEXT") {
+        child.previous.raw += child.toString();
+        child.detach();
+        continue;
+      }
+      // Convert inline to text node
+      child.replace(new Node(null, "TEXT", child.toString()));
+      continue;
+    }
   }
-  await Promise.all(work);
 };
 
 /** Parse and render inline HTML and Markdown */
 export const renderNode = async (
   text: string,
   options: HmmOptions,
-  tag?: string
-): Promise<{text: string; node: HmmNode}> => {
-  const node = parseNode(text, tag);
+  tag?: string,
+): Promise<{ text: string; node: Node }> => {
+  const node = parseHTML(text, { ...parseOptions, rootTag: tag ?? "html" });
+
+  // Flag child nodes to ignore
+  node.traverse((n) => {
+    if (parseTags.has(n.tag)) return;
+    node.type === "OPAQUE";
+  });
+
+  // Render inline markdown and then merge
   await renderTextNodes(node, options);
-  // Merge rendered text inlines nodes
-  node.merge(
-    (node) => node.type === 'open' && inlineElements.includes(node.tag ?? ''),
-    'text'
-  );
-  node.mergeText();
-  await renderImageNodes(node, options);
-  text = node.flatten();
-  return {text, node};
+  mergeText(node);
+
+  // Wrap paragraphs
+  /** @todo queue worker later? */
+  node.traverse((n) => {
+    if (n.type !== "TEXT") return;
+    if (n.parent === null) return;
+    if (n.tag === "p") return false;
+    if (parentTags.has(n.parent.tag)) {
+      const p = new Node(null, "ELEMENT", "<p>", "p");
+      n.replace(p);
+      p.append(n);
+    }
+  });
+
+  // Replace excess whitespace in paragraphs
+  const remove = new Set<Node>();
+  node.traverse((n) => {
+    if (n.tag !== "p") return;
+    let raw = n.children[0].raw;
+    raw = raw.trim();
+    raw = raw.replace(/\n{3,}/g, "\n\n");
+    if (raw.length === 0 || /^\s+$/.test(raw)) {
+      remove.add(n);
+      return;
+    }
+    raw = raw.replaceAll("\n\n", "</p><p>");
+    raw = raw.replaceAll("\n", "<br/>");
+    n.children[0].raw = raw;
+  });
+  remove.forEach((n) => n.detach());
+
+  text = node.toString();
+  return { text, node };
 };

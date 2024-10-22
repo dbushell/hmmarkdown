@@ -1,6 +1,6 @@
 {
   "name": "@dbushell/hmmarkdown",
-  "version": "0.11.0",
+  "version": "0.12.0",
   "exports": {
     ".": "./mod.ts",
     "./types": "./src/types.ts"
@@ -11,5 +11,9 @@
   },
   "lint": {
     "include": ["**/*.ts"]
+  },
+  "imports": {
+    "@dbushell/hyperless": "jsr:@dbushell/hyperless@^0.26.0",
+    "@std/streams": "jsr:@std/streams@^1.0.7"
   }
 }

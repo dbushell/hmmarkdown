@@ -1,47 +1,27 @@
-import type {HmmBlock, BlockPlugin, HmmOptions} from '../types.ts';
-import {escape} from '../vendor/std-html.ts';
+import type { BlockPlugin, HmmBlock } from "../types.ts";
+import { escape } from "@dbushell/hyperless";
 
 const REGEXP = /^!\[([^\]]+)\]\(([^()\s]+)\)/;
-// const REGEXP = /^!\[([^\]]+)\]\(([^)]+)\)/;
 
 /**
  * @todo Allow optional title syntax?
  */
 const plugin: BlockPlugin = {
-  type: 'image',
+  type: "image",
   multiline: false,
   matchStart: (line: string): false | Array<string> => {
-    if (line[0] !== '!') return false;
-    if (line[1] !== '[') return false;
-    if (line[line.length - 1] !== ')') return false;
+    if (line[0] !== "!") return false;
+    if (line[1] !== "[") return false;
+    if (line[line.length - 1] !== ")") return false;
     const match = line.match(REGEXP);
     return match ? [match[1], match[2]] : false;
   },
-  render: async (block: HmmBlock, options: HmmOptions): Promise<string> => {
-    const props = {
-      attributes: {
-        alt: block.matches[0],
-        src: block.matches[1]
-      },
-      before: '',
-      after: ''
-    };
-    /** @todo Fix this hack? */
-    if (typeof block.matches[2] === 'object') {
-      props.attributes = {
-        ...props.attributes,
-        ...(block.matches[2] as object)
-      };
-    }
-    const filter = options.blockFilters.image;
-    if (filter) await filter(props);
-    const attr = Object.entries(props.attributes)
-      .filter(([k]) => !k.startsWith('_'))
-      .map(([k, v]) => `${k}="${escape(v)}"`)
-      .join(' ');
-    block.render = `${props.before}<img ${attr}>${props.after}`;
-    return block.render;
-  }
+  render: (block: HmmBlock): Promise<string> => {
+    const alt = escape(block.matches[0]);
+    const src = escape(block.matches[1]);
+    block.render = `<img alt="${alt}" src="${src}">`;
+    return Promise.resolve(block.render);
+  },
 };
 
 export default plugin;
