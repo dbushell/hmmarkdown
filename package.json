@@ -1,6 +1,6 @@
 {
   "name": "@dbushell/hmmarkdown",
-  "version": "0.11.0",
+  "version": "0.12.0",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/dbushell/hmmarkdown.git"
@@ -23,5 +23,9 @@
     "package.json",
     "LICENSE",
     "README.md"
-  ]
+  ],
+  "dependencies": {
+    "@dbushell/hyperless": "npm:@jsr/dbushell__hyperless@^0.26.0",
+    "@std/streams": "npm:@jsr/std__streams@^1.0.7"
+  }
 }
