@@ -4,6 +4,7 @@
 !.gitignore
 !deno.json
 !package.json
+!.npmrc
 !README.md
 !LICENSE
 !mod.ts

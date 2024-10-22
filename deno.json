@@ -1,13 +1,13 @@
 {
   "name": "@dbushell/hmmarkdown",
-  "version": "0.12.0",
+  "version": "0.13.0",
   "exports": {
     ".": "./mod.ts",
     "./types": "./src/types.ts"
   },
   "publish": {
     "include": ["src", "mod.ts", "deno.json", "LICENSE", "README.md"],
-    "exclude": [".github", "test", "package.json"]
+    "exclude": [".github", "test", "package.json", ".npmrc"]
   },
   "lint": {
     "include": ["**/*.ts"]
