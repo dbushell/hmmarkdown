@@ -1,7 +1,7 @@
 import type { HmmOptions } from "./types.ts";
 import {
   getParseOptions,
-  inlineTags,
+  mergeInlineNodes,
   Node,
   parseHTML,
 } from "@dbushell/hyperless";
@@ -42,35 +42,6 @@ export const renderTextNodes = async (
   );
 };
 
-/** Apply image render to top-level HTML `<img>` nodes */
-
-// Convert inline tags to text nodes
-const mergeText = (n: Node) => {
-  for (const child of [...n.children]) {
-    if (child.type === "OPAQUE") {
-      continue;
-    }
-    mergeText(child);
-    // Merge adjacent text nodes
-    if (child.type === "TEXT" && child.previous?.type === "TEXT") {
-      child.previous.raw += child.toString();
-      child.detach();
-      continue;
-    }
-    if (inlineTags.has(child.tag)) {
-      // Merge inline into previous text node
-      if (child.previous?.type === "TEXT") {
-        child.previous.raw += child.toString();
-        child.detach();
-        continue;
-      }
-      // Convert inline to text node
-      child.replace(new Node(null, "TEXT", child.toString()));
-      continue;
-    }
-  }
-};
-
 /** Parse and render inline HTML and Markdown */
 export const renderNode = async (
   text: string,
@@ -87,38 +58,54 @@ export const renderNode = async (
 
   // Render inline markdown and then merge
   await renderTextNodes(node, options);
-  mergeText(node);
+  mergeInlineNodes(node);
 
-  // Wrap paragraphs
-  /** @todo queue worker later? */
+  // Find text Nodes that need paragraphs
+  const wrapNodes: Array<Node> = [];
   node.traverse((n) => {
+    if (n.tag === "p") return false;
     if (n.type !== "TEXT") return;
     if (n.parent === null) return;
-    if (n.tag === "p") return false;
     if (parentTags.has(n.parent.tag)) {
-      const p = new Node(null, "ELEMENT", "<p>", "p");
-      n.replace(p);
-      p.append(n);
+      wrapNodes.push(n);
     }
   });
 
-  // Replace excess whitespace in paragraphs
-  const remove = new Set<Node>();
-  node.traverse((n) => {
-    if (n.tag !== "p") return;
-    let raw = n.children[0].raw;
-    raw = raw.trim();
+  // Wrap text Nodes in paragraphs
+  for (const oldText of wrapNodes) {
+    // Collapse excess whitespace
+    let raw = oldText.raw.trim();
     raw = raw.replace(/\n{3,}/g, "\n\n");
-    if (raw.length === 0 || /^\s+$/.test(raw)) {
-      remove.add(n);
-      return;
+    // Iterate paragraphs
+    for (const str of oldText.raw.split("\n\n")) {
+      // Skip empty lines
+      if (/^\s*$/.test(str)) continue;
+      // Create new text Node
+      const newText = parseHTML(str);
+      // Do not wrap single <img> elements
+      if (newText.size === 1 && newText.at(0)?.tag === "img") {
+        oldText.before(newText);
+        continue;
+      }
+      // Handle line breaks
+      newText.traverse((n) => {
+        if (n.type !== "TEXT") return;
+        if (n.previous === null) {
+          n.raw = n.raw.replace(/^\s*\n/g, "");
+        }
+        if (n.next === null) {
+          n.raw = n.raw.replace(/\n\s*$/g, "");
+        }
+        n.raw = n.raw.replaceAll("\n", "<br/>");
+      });
+      // Wrap in paragraph Node
+      const p = new Node(null, "ELEMENT", "<p>", "p");
+      p.append(newText);
+      oldText.before(p);
     }
-    raw = raw.replaceAll("\n\n", "</p><p>");
-    raw = raw.replaceAll("\n", "<br/>");
-    n.children[0].raw = raw;
-  });
-  remove.forEach((n) => n.detach());
+    // Remove original Node
+    oldText.detach();
+  }
 
-  text = node.toString();
-  return { text, node };
+  return { node, text: node.toString() };
 };

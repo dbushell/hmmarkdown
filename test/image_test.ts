@@ -17,7 +17,7 @@ Deno.test("inline image", async () => {
   );
   assertEquals(
     html,
-    '<p>inline <img alt="photo of a lime 🍋‍🟩" src="https://example.com/ling.avif"></p>',
+    '<p>inline <img alt="photo of a lime 🍋‍🟩" src="https://example.com/ling.avif"/></p>',
   );
 });
 
@@ -27,6 +27,6 @@ Deno.test("linked image", async () => {
   );
   assertEquals(
     html,
-    '<p><a href="https://example.com"><img alt="photo of a lime 🍋‍🟩" src="https://example.com/ling.avif"></a></p>',
+    '<p><a href="https://example.com"><img alt="photo of a lime 🍋‍🟩" src="https://example.com/ling.avif"/></a></p>',
   );
 });
