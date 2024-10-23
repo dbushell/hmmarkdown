@@ -19,7 +19,7 @@ const plugin: BlockPlugin = {
     const lines: Array<string> = [];
     for (let i = 0; i < block.lines.length; i++) {
       const line = block.lines[i];
-      if (line.trim() === "") continue;
+      if (/^\s*$/.test(line)) continue;
       if (line[0] === "*") {
         lines.push(line.substring(2));
       } else {
@@ -27,7 +27,7 @@ const plugin: BlockPlugin = {
       }
     }
     for (const line of lines) {
-      const { text } = await renderNode(line, options, "ul");
+      const { text } = await renderNode(line, options, "li");
       block.render += `<li>${text}</li>`;
     }
     block.render += "</ul>";
