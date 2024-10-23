@@ -19,8 +19,7 @@ const plugin: BlockPlugin = {
       // Skip empty lines
       line = line.substring(2);
       if (/^\s*$/.test(line)) continue;
-      const { text } = await renderNode(line, options, "blockquote");
-      block.render += text;
+      block.render += await renderNode(line, options, "blockquote");
     }
     block.render += "</blockquote>";
     return block.render;

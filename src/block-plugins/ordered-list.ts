@@ -27,7 +27,7 @@ const plugin: BlockPlugin = {
       }
     }
     for (const line of lines) {
-      const { text } = await renderNode(line, options, "li");
+      const text = await renderNode(line, options, "li");
       block.render += `<li>${text}</li>`;
     }
     block.render += "</ol>";

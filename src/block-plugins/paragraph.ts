@@ -33,8 +33,7 @@ const plugin: BlockPlugin = {
             continue;
           }
           // Render inline markdown only
-          const { text } = await renderNode(raw, options, "html");
-          child.raw = text;
+          child.raw = await renderNode(raw, options, "html");
           continue;
         }
         // Recurse special elements
@@ -43,7 +42,7 @@ const plugin: BlockPlugin = {
           continue;
         }
         // For other elements render inline markdown
-        const { text } = await renderNode(child.toString(), options, "html");
+        const text = await renderNode(child.toString(), options, "html");
         const textNode = new Node(null, "TEXT", text);
         child.replace(textNode);
       }

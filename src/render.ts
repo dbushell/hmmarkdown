@@ -47,7 +47,7 @@ export const renderNode = async (
   text: string,
   options: HmmOptions,
   tag?: string,
-): Promise<{ text: string; node: Node }> => {
+): Promise<string> => {
   const node = parseHTML(text, { ...parseOptions, rootTag: tag ?? "html" });
 
   // Flag child nodes to ignore
@@ -107,5 +107,5 @@ export const renderNode = async (
     oldText.detach();
   }
 
-  return { node, text: node.toString() };
+  return node.toString();
 };

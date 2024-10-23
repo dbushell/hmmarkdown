@@ -34,10 +34,10 @@ const plugin: BlockPlugin = {
     let line = block.lines[0];
     line = line.replace(/^#{1,6}\s+/, "");
     const level = block.matches[0].length;
-    const { text } = await renderNode(line, options, `h${level}`);
-    block.render = `<h${level}`;
-    block.render += ` id="${idAttribute(line)}"`;
-    block.render += `>${text}</h${level}>`;
+
+    block.render = `<h${level} id="${idAttribute(line)}">`;
+    block.render += await renderNode(line, options, `h${level}`);
+    block.render += `</h${level}>`;
     return block.render;
   },
 };
