@@ -1,14 +1,29 @@
 import type { HmmBlock, HmmOptions } from "./types.ts";
 
-/** Parse lines and yield Markdown blocks */
-export async function* blockGenerator(
+/** Transform lines into Markdown blocks */
+export const blockParser = (
   allLines: Array<string>,
   options: HmmOptions,
-): AsyncGenerator<HmmBlock, void, void> {
-  // Buffers
+): Array<HmmBlock> => {
+  const blocks: Array<HmmBlock> = [];
+
   let type: string | undefined;
   let lines: Array<string> = [];
   let matches: Array<string> = [];
+
+  // Flush multi-line block and reset parser
+  const flushBuffer = () => {
+    if (type === undefined) throw new Error("undefined type");
+    blocks.push({
+      type,
+      lines,
+      matches,
+      render: "",
+    });
+    type = undefined;
+    lines = [];
+    matches = [];
+  };
 
   nextLine: while (allLines.length) {
     const line = allLines.shift()!;
@@ -20,16 +35,7 @@ export async function* blockGenerator(
       if (plugin.matchEnd) {
         lines.push(line);
         if (plugin.matchEnd(line)) {
-          if (type === undefined) throw new Error("undefined type");
-          yield {
-            type,
-            lines,
-            matches,
-            render: "",
-          };
-          type = undefined;
-          lines = [];
-          matches = [];
+          flushBuffer();
         }
         continue;
       }
@@ -38,20 +44,10 @@ export async function* blockGenerator(
         lines.push(line);
         continue;
       }
-      if (type === undefined) throw new Error("undefined type");
-      yield {
-        type,
-        lines,
-        matches: matches,
-        render: "",
-      };
-      type = undefined;
-      lines = [];
-      matches = [];
+      flushBuffer();
       continue;
     }
     // Check for new block match
-
     for (const plugin of options.blockPlugins) {
       let newMatches = plugin.matchStart(line, 0);
       if (newMatches === false) {
@@ -60,12 +56,12 @@ export async function* blockGenerator(
       newMatches = Array.isArray(newMatches) ? newMatches : [];
       // Empty lines as default block
       if (lines.length) {
-        yield {
+        blocks.push({
           lines,
           type: "paragraph",
           matches: [],
           render: "",
-        };
+        });
         lines = [];
       }
       if (plugin.multiline) {
@@ -74,12 +70,12 @@ export async function* blockGenerator(
         lines.push(line);
         continue nextLine;
       }
-      yield {
+      blocks.push({
         type: plugin.type,
         matches: newMatches,
         lines: [line],
         render: "",
-      };
+      });
       continue nextLine;
     }
     // Continue with default paragraph block
@@ -87,11 +83,12 @@ export async function* blockGenerator(
   }
   // Empty leftover lines
   if (lines.length) {
-    yield {
+    blocks.push({
       lines,
       type: type ?? "paragraph",
       matches: [],
       render: "",
-    };
+    });
   }
-}
+  return blocks;
+};

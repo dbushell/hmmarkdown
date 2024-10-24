@@ -1,6 +1,6 @@
 import type { HmmBlock, HmmOptions } from "./types.ts";
+import { blockParser } from "./block-parser.ts";
 import { BlockStream } from "./block-stream.ts";
-import { blockGenerator } from "./block-generator.ts";
 import { TextLineStream } from "@std/streams/text-line-stream";
 
 // Block Plugins
@@ -52,12 +52,12 @@ export const parse = async (
   input: string | ReadableStream<Uint8Array>,
   options = defaultOptions,
 ): Promise<Array<Promise<string>>> => {
-  let stream: ReadableStream<HmmBlock> | AsyncGenerator<HmmBlock, void, void>;
+  let stream: AsyncIterable<HmmBlock> | Iterable<HmmBlock>;
 
   if (typeof input === "string") {
     // Read string input
     const lines = input.split("\n");
-    stream = blockGenerator(lines, options);
+    stream = blockParser(lines, options);
   } else {
     // Read streamable input
     stream = input
