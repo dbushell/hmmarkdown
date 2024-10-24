@@ -6,7 +6,7 @@ const REGEXP = /!\[([^\]]+)\]\(([^()\s]+)\)/g;
 const plugin: InlinePlugin = {
   type: "image",
   render: (text: string): Promise<string> => {
-    if (text.indexOf("![") === -1) {
+    if (text.includes("![") === false) {
       return Promise.resolve(text);
     }
     for (const match of text.matchAll(REGEXP)) {

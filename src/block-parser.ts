@@ -25,8 +25,10 @@ export const blockParser = (
     matches = [];
   };
 
+  allLines.reverse();
+
   nextLine: while (allLines.length) {
-    const line = allLines.shift()!;
+    const line = allLines.pop()!;
     // Work with previous multi-line block
     if (type) {
       const plugin = options.blockPlugins.find((p) => p.type === type);

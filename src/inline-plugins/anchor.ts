@@ -56,7 +56,7 @@ const plugin: InlinePlugin = {
   render: async (out: string, options: HmmOptions) => {
     // Find unprocessed inline code markdown
     const codeOffsets: Array<[number, number]> = [];
-    if (out.indexOf("`") !== -1) {
+    if (out.includes("`") !== false) {
       for (const code of out.matchAll(/`[^`]+`/g)) {
         codeOffsets.push([code.index, code.index + code[0].length]);
       }

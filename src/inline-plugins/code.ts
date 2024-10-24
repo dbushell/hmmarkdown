@@ -6,7 +6,7 @@ const REGEXP = /`([^`]+)`/g;
 const plugin: InlinePlugin = {
   type: "code",
   prerender: (text: string) => {
-    if (text.indexOf("`") === -1) return text;
+    if (text.includes("`") === false) return text;
     // Inline code is escaped early to avoid `<div>` being parsed as HTML node
     return text.replace(REGEXP, (...match) => escape(match[0]));
   },

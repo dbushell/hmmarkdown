@@ -21,7 +21,7 @@ const plugin: InlinePlugin = {
     text = text.replace(/\.\.\./g, "…");
 
     // Skip if no quotes found
-    if (text.indexOf("'") === -1 && text.indexOf('"') === -1) {
+    if (text.includes("'") === false && text.includes('"') === false) {
       return Promise.resolve(text);
     }
 
