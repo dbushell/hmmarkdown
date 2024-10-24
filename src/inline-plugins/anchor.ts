@@ -80,8 +80,10 @@ const plugin: InlinePlugin = {
       }
       text = await renderInline(text, {
         ...options,
-        inlinePlugins: options.inlinePlugins.filter((plugin) =>
-          inlinePlugins.includes(plugin.type)
+        inlinePlugins: new Map(
+          [...options.inlinePlugins].filter(([type]) =>
+            inlinePlugins.includes(type)
+          ),
         ),
       });
       out = out.replace(anchor, () => `<a href="${escape(href)}">${text}</a>`);

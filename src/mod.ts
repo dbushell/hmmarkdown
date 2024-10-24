@@ -1,7 +1,8 @@
 import type { HmmBlock, HmmOptions } from "./types.ts";
+import { TextLineStream } from "@std/streams/text-line-stream";
+import { escape, unescape } from "@dbushell/hyperless";
 import { blockParser } from "./block-parser.ts";
 import { BlockStream } from "./block-stream.ts";
-import { TextLineStream } from "@std/streams/text-line-stream";
 
 // Block Plugins
 import blockBlockquote from "./block-plugins/blockquote.ts";
@@ -25,27 +26,27 @@ import inlineTypography from "./inline-plugins/typography.ts";
 
 // Default options
 export const defaultOptions: HmmOptions = {
-  blockPlugins: [
-    blockBlockquote,
-    blockPreformatted,
-    blockHeading,
-    blockHorizontalRule,
-    blockImage,
-    blockOrderedList,
-    blockUnorderedList,
-    blockParagraph,
-  ],
+  blockPlugins: new Map([
+    [blockBlockquote.type, blockBlockquote],
+    [blockPreformatted.type, blockPreformatted],
+    [blockHeading.type, blockHeading],
+    [blockHorizontalRule.type, blockHorizontalRule],
+    [blockImage.type, blockImage],
+    [blockOrderedList.type, blockOrderedList],
+    [blockUnorderedList.type, blockUnorderedList],
+    [blockParagraph.type, blockParagraph],
+  ]),
   // Order is significant
-  inlinePlugins: [
-    inlineTypography,
-    inlineEscape,
-    inlineImage,
-    inlineAnchor,
-    inlineCode,
-    inlineStrong,
-    inlineEmphasis,
-    inlineDeleted,
-  ],
+  inlinePlugins: new Map([
+    [inlineTypography.type, inlineTypography],
+    [inlineEscape.type, inlineEscape],
+    [inlineImage.type, inlineImage],
+    [inlineAnchor.type, inlineAnchor],
+    [inlineCode.type, inlineCode],
+    [inlineStrong.type, inlineStrong],
+    [inlineEmphasis.type, inlineEmphasis],
+    [inlineDeleted.type, inlineDeleted],
+  ]),
 };
 
 export const parse = async (
@@ -66,26 +67,23 @@ export const parse = async (
       .pipeThrough(new BlockStream(options));
   }
 
-  // Get pre-render plugins
-  const prerender = options.inlinePlugins.filter((plugin) =>
-    Object.hasOwn(plugin, "prerender")
-  );
-
   // Final block renders
   const blocks: Array<Promise<string>> = [];
 
   for await (const block of stream) {
-    // Apply pre-render plugins to all lines
     if (block.type !== "preformatted") {
+      // Inline code is escaped early to avoid `<div>` being parsed as HTML node
       for (let i = 0; i < block.lines.length; i++) {
-        prerender.forEach((plugin) => {
-          block.lines[i] = plugin.prerender!(block.lines[i], options);
-        });
+        if (block.lines[i].includes("`") === false) continue;
+        block.lines[i] = block.lines[i].replace(
+          /`([^`]+)`/g,
+          (...match) => escape(unescape(match[0])),
+        );
       }
     }
     // Start block render
-    const plugin = options.blockPlugins.find((p) => p.type === block.type)!;
-    blocks.push(Promise.resolve(plugin.render(block, options)));
+    const plugin = options.blockPlugins.get(block.type)!;
+    blocks.push(plugin.render(block, options));
   }
   return blocks;
 };

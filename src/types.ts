@@ -19,11 +19,10 @@ export type BlockPlugin = {
 export type InlinePlugin = {
   type: string;
   render: (text: string, options: HmmOptions) => Promise<string>;
-  prerender?: (text: string, options: HmmOptions) => string;
 };
 
 /** Markdown block stream options */
 export type HmmOptions = {
-  blockPlugins: Array<BlockPlugin>;
-  inlinePlugins: Array<InlinePlugin>;
+  blockPlugins: Map<string, BlockPlugin>;
+  inlinePlugins: Map<string, InlinePlugin>;
 };

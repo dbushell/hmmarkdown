@@ -15,7 +15,7 @@ export const renderInline = async (
   text: string,
   options: HmmOptions,
 ): Promise<string> => {
-  for (const plugin of options.inlinePlugins) {
+  for (const plugin of options.inlinePlugins.values()) {
     if (["anchor", "code"].includes(plugin.type)) {
       text = await plugin.render(text, options);
     } else {

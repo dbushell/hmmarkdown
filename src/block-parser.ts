@@ -31,7 +31,7 @@ export const blockParser = (
     const line = allLines.pop()!;
     // Work with previous multi-line block
     if (type) {
-      const plugin = options.blockPlugins.find((p) => p.type === type);
+      const plugin = options.blockPlugins.get(type)!;
       if (plugin === undefined) throw new Error("undefined plugin");
       // Check for end of multi-line block
       if (plugin.matchEnd) {
@@ -50,7 +50,7 @@ export const blockParser = (
       continue;
     }
     // Check for new block match
-    for (const plugin of options.blockPlugins) {
+    for (const plugin of options.blockPlugins.values()) {
       let newMatches = plugin.matchStart(line, 0);
       if (newMatches === false) {
         continue;
