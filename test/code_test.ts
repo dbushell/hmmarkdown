@@ -25,3 +25,8 @@ Deno.test("code (anchor inception)", async () => {
     "<p><code>This [emoji] 🍋‍🟩 is a [lime](https://emojipedia.org/lime) ok?</code></p>",
   );
 });
+
+Deno.test("code (html)", async () => {
+  const html = await hmmarkdown("<div>`</div>`</div>");
+  assertEquals(html, "<div><p><code>&lt;/div&gt;</code></p></div>");
+});
