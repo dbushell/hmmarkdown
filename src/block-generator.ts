@@ -10,7 +10,7 @@ export async function* blockGenerator(
   let lines: Array<string> = [];
   let matches: Array<string> = [];
 
-  while (allLines.length) {
+  nextLine: while (allLines.length) {
     const line = allLines.shift()!;
     // Work with previous multi-line block
     if (type) {
@@ -51,13 +51,12 @@ export async function* blockGenerator(
       continue;
     }
     // Check for new block match
-    let found = false;
+
     for (const plugin of options.blockPlugins) {
       let newMatches = plugin.matchStart(line, 0);
       if (newMatches === false) {
         continue;
       }
-      found = true;
       newMatches = Array.isArray(newMatches) ? newMatches : [];
       // Empty lines as default block
       if (lines.length) {
@@ -73,7 +72,7 @@ export async function* blockGenerator(
         type = plugin.type;
         matches = newMatches;
         lines.push(line);
-        break;
+        continue nextLine;
       }
       yield {
         type: plugin.type,
@@ -81,12 +80,10 @@ export async function* blockGenerator(
         lines: [line],
         render: "",
       };
-      break;
+      continue nextLine;
     }
     // Continue with default paragraph block
-    if (found == false) {
-      lines.push(line);
-    }
+    lines.push(line);
   }
   // Empty leftover lines
   if (lines.length) {
