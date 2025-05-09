@@ -1,6 +1,6 @@
 import type { HmmBlock, HmmOptions } from "./types.ts";
 import { TextLineStream } from "@std/streams/text-line-stream";
-import { escape, unescape } from "@dbushell/hyperless";
+import { escape, inlineTags, unescape } from "@dbushell/hyperless";
 import { blockParser } from "./block-parser.ts";
 import { BlockStream } from "./block-stream.ts";
 
@@ -47,6 +47,7 @@ export const defaultOptions: HmmOptions = {
     [inlineEmphasis.type, inlineEmphasis],
     [inlineDeleted.type, inlineDeleted],
   ]),
+  inlineTags,
 };
 
 export const parse = async (
@@ -91,9 +92,13 @@ export const parse = async (
 /** Render Markdown stream to HTML */
 export const hmmarkdown = async (
   input: string | ReadableStream<Uint8Array>,
-  options = defaultOptions,
+  options: Partial<HmmOptions> = {},
 ): Promise<string> => {
-  const blocks = await parse(input, options);
+  const parseOptions = { ...defaultOptions };
+  if (options.inlineTags) {
+    parseOptions.inlineTags = parseOptions.inlineTags.union(options.inlineTags);
+  }
+  const blocks = await parse(input, parseOptions);
   return (await Promise.all(blocks)).join("");
 };
 

@@ -25,4 +25,5 @@ export type InlinePlugin = {
 export type HmmOptions = {
   blockPlugins: Map<string, BlockPlugin>;
   inlinePlugins: Map<string, InlinePlugin>;
+  inlineTags: Set<string>;
 };

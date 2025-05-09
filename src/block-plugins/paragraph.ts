@@ -1,8 +1,9 @@
-import { mergeInlineNodes, Node, parseHTML } from "@dbushell/hyperless";
+import { mergeInlineNodes, Node } from "@dbushell/hyperless";
 import { renderNode } from "../render.ts";
 import type { BlockPlugin, HmmBlock, HmmOptions } from "../types.ts";
 import { parentTags } from "../html.ts";
 import { hmmarkdown } from "../mod.ts";
+import { parseHTML } from "../utils.ts";
 
 /** @todo Configurable option? */
 const tab = "  ";
@@ -18,8 +19,8 @@ const plugin: BlockPlugin = {
     // Parse content as HTML and merge inline elements.
     // e.g. "Start <b>middle</b> end." becomes one text node.
     const content = block.lines.join("\n");
-    const root = parseHTML(content);
-    mergeInlineNodes(root);
+    const root = parseHTML(content, options);
+    mergeInlineNodes(root, options.inlineTags);
 
     const render = async (node: Node) => {
       for (const child of node.children) {

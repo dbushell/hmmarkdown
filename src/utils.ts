@@ -1,3 +1,40 @@
+import type { HmmOptions } from "./types.ts";
+import {
+  getParseOptions,
+  type Node,
+  parseHTML as originalParseHTML,
+  type ParseOptions,
+} from "@dbushell/hyperless";
+
+/** Extended with options */
+export const parseHTML = (
+  html: string,
+  options: HmmOptions,
+  parse_options: Partial<ParseOptions> = {},
+): Node => {
+  const original = getParseOptions();
+  let { inlineTags, opaqueTags, voidTags } = original;
+  if (options.inlineTags) {
+    inlineTags = inlineTags.union(options.inlineTags);
+  }
+  if (parse_options?.inlineTags) {
+    inlineTags = inlineTags.union(parse_options.inlineTags);
+  }
+  if (parse_options?.opaqueTags) {
+    opaqueTags = opaqueTags.union(parse_options.opaqueTags);
+  }
+  if (parse_options?.voidTags) {
+    voidTags = voidTags.union(parse_options.voidTags);
+  }
+  return originalParseHTML(html, {
+    ...original,
+    ...parse_options,
+    inlineTags,
+    opaqueTags,
+    voidTags,
+  });
+};
+
 /** Perform replace on string parts ignoring inline code */
 export const splitCode = async (
   text: string,

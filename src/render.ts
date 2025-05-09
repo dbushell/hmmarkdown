@@ -1,14 +1,7 @@
 import type { HmmOptions } from "./types.ts";
-import {
-  getParseOptions,
-  mergeInlineNodes,
-  Node,
-  parseHTML,
-} from "@dbushell/hyperless";
-import { splitCode } from "./utils.ts";
+import { mergeInlineNodes, Node } from "@dbushell/hyperless";
+import { parseHTML, splitCode } from "./utils.ts";
 import { parentTags, parseTags } from "./html.ts";
-
-const parseOptions = getParseOptions();
 
 /** Render inline Markdown */
 export const renderInline = async (
@@ -48,17 +41,17 @@ export const renderNode = async (
   options: HmmOptions,
   tag?: string,
 ): Promise<string> => {
-  const node = parseHTML(text, { ...parseOptions, rootTag: tag ?? "html" });
+  const node = parseHTML(text, options, { rootTag: tag ?? "html" });
 
   // Flag child nodes to ignore
   node.traverse((n) => {
-    if (parseTags.has(n.tag)) return;
+    if ((parseTags.union(options.inlineTags)).has(n.tag)) return;
     node.type === "OPAQUE";
   });
 
   // Render inline markdown and then merge
   await renderTextNodes(node, options);
-  mergeInlineNodes(node);
+  mergeInlineNodes(node, options.inlineTags);
 
   // Find text Nodes that need paragraphs
   const wrapNodes: Array<Node> = [];
@@ -81,7 +74,7 @@ export const renderNode = async (
       // Skip empty lines
       if (/^\s*$/.test(str)) continue;
       // Create new text Node
-      const newText = parseHTML(str);
+      const newText = parseHTML(str, options);
       // Do not wrap single <img> elements
       if (newText.size === 1 && newText.at(0)?.tag === "img") {
         oldText.before(newText);

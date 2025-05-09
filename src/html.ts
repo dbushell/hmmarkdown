@@ -1,5 +1,3 @@
-import { inlineTags } from "@dbushell/hyperless";
-
 /** Block elements with text nodes to wrap in a paragraph */
 export const parentTags = new Set([
   "article",
@@ -22,7 +20,6 @@ export const parentTags = new Set([
 
 /** Elements to parse for Markdown text content */
 export const parseTags = new Set([
-  ...inlineTags,
   ...parentTags,
   "address",
   "caption",

@@ -7,7 +7,7 @@ const idAttribute = (text: string) =>
   text
     // Remove diacritical marks
     .normalize("NFD")
-    .replace(/[\u0300-\u036F]/g, "")
+    .replace(/\p{Diacritic}/gu, "")
     .toLowerCase()
     // Strip tags
     .replace(/<\/?[^>]+>/g, "")
