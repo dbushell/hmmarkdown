@@ -39,3 +39,23 @@ Deno.test("<figure> with blockquote markdown and <cite> with markdown anchor", a
     `<figure><blockquote><p>This is multiline</p><p>blockquote content</p><p>on <em>three</em> lines.</p></blockquote><figcaption>With <cite><a href="http://example.com">citation</a></cite></figcaption></figure>`,
   );
 });
+
+Deno.test("multi level html", async () => {
+  const input = `<article>
+  # Heading
+  <figure>
+    > Blockquote
+    <figcaption>With <cite>[citation](http://example.com)</cite></figcaption>
+  </figure>
+  <aside>
+    * One
+    * Two
+    * Three
+  </aside>
+</article>`;
+  const html = await hmmarkdown(input);
+  assertEquals(
+    html,
+    `<article><h1 id="heading">Heading</h1><figure><blockquote><p>Blockquote</p></blockquote><figcaption>With <cite><a href="http://example.com">citation</a></cite></figcaption></figure><aside><ul><li>One</li><li>Two</li><li>Three</li></ul></aside></article>`,
+  );
+});
